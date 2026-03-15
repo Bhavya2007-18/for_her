@@ -58,6 +58,11 @@ export default function App() {
       setCurrentYearIndex(prev => prev + 1);
       setCurrentInput('');
     } else {
+      // Final submission to Google Form
+      const finalAnswers = [...answers];
+      finalAnswers[currentYearIndex] = currentInput;
+      sendToGoogleForm(finalAnswers);
+
       // Feature 2: Birthday Celebration Animation
       await playBirthdayConfetti();
       showPreparingMessage();
@@ -65,6 +70,23 @@ export default function App() {
         redirectToCelebration();
       }, 1500);
     }
+  };
+
+  const sendToGoogleForm = (finalAnswers: string[]) => {
+    const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzX-PKHRo9c1GcEy-dFktpD8CjXYlIj5QDBKXLBcxl_JqIAQ/formResponse";
+    const formData = new FormData();
+
+    // Map the answers to the Google Form fields using entry IDs
+    // NOTE: Replace FIELD_ID_1, FIELD_ID_2, etc. with your actual Google Form entry IDs
+    finalAnswers.forEach((answer, index) => {
+      formData.append(`entry.FIELD_ID_${index + 1}`, answer);
+    });
+
+    fetch(formURL, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData
+    }).catch(err => console.error("Google Form submission error:", err));
   };
 
   const playMemoryCaptureEffect = () => {
