@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 20th Birthday!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #C0C1FF;
+            --secondary: #FFD1E3;
+            --tertiary: #D1FFD1;
+            --background: #050505;
+        }
+        body {
+            background-color: var(--background);
+            color: white;
+            font-family: 'Manrope', sans-serif;
+            overflow: hidden;
+        }
+        .font-headline { font-family: 'Epilogue', sans-serif; }
+        .glow-text {
+            text-shadow: 0 0 30px rgba(192, 193, 255, 0.4);
+            animation: glow 4s infinite ease-in-out;
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(192, 193, 255, 0.3); }
+            50% { text-shadow: 0 0 40px rgba(192, 193, 255, 0.6); }
+        }
+        .gradient-text {
+            background: linear-gradient(to right, var(--primary), var(--secondary), var(--tertiary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="relative z-10 text-center px-6">
+        <div class="mb-8 opacity-0 animate-[fadeIn_1s_ease-out_forwards]">
+            <span class="text-sm uppercase tracking-[0.4em] text-gray-400 mb-6 block">The Journey Continues</span>
+            <h1 class="font-headline text-6xl md:text-8xl font-extrabold leading-tight tracking-tighter glow-text">
+                Happy 20th <br />
+                <span class="gradient-text">Birthday</span>
+            </h1>
+        </div>
+        <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed opacity-0 animate-[fadeIn_1s_ease-out_0.5s_forwards]">
+            You've successfully archived 20 years of magic. Your story is just beginning, and the horizon looks brighter than ever.
+        </p>
+        <div class="flex flex-col md:flex-row items-center justify-center gap-6 opacity-0 animate-[fadeIn_1s_ease-out_1s_forwards]">
+            <a href="/" class="px-10 py-5 bg-white text-black font-bold text-lg rounded-full hover:scale-105 transition-transform">
+                Back to Start
+            </a>
+            <button onclick="celebrateAgain()" class="px-10 py-5 glass-card text-white font-bold text-lg rounded-full hover:bg-white/10 transition-all">
+                Celebrate Again
+            </button>
+        </div>
+    </div>
+
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[150px]"></div>
+    </div>
+
+    <script>
+        function celebrateAgain() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Initial celebration
+        window.onload = () => {
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#C0C1FF', '#FFD1E3']
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#C0C1FF', '#FFD1E3']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            confetti({
+                particleCount: 200,
+                spread: 90,
+                origin: { y: 0.6 }
+            });
+        };
+    </script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body>
+</html>
