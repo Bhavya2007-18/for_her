@@ -202,7 +202,7 @@ const JourneyScreen: React.FC<{
   );
 };
 
-const CelebrationScreen: React.FC<{ setScreen: (s: Screen) => void }> = ({ setScreen }) => (
+const CelebrationScreen: React.FC<{ setScreen: (s: Screen) => void, triggerConfetti: () => void }> = ({ setScreen, triggerConfetti }) => (
   <motion.main 
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
@@ -234,8 +234,8 @@ const CelebrationScreen: React.FC<{ setScreen: (s: Screen) => void }> = ({ setSc
         <button onClick={() => setScreen('timeline')} className="px-10 py-5 bg-gradient-to-r from-primary to-primary-container text-on-primary-fixed font-label font-bold text-lg rounded-full shadow-[0_0_40px_rgba(192,193,255,0.2)] hover:scale-105 transition-transform duration-300">
           See Your Journey
         </button>
-        <button className="px-10 py-5 bg-surface-bright/10 backdrop-blur-md border border-white/5 text-on-surface font-label font-bold text-lg rounded-full hover:bg-surface-bright/20 transition-all">
-          Send a Wish
+        <button onClick={triggerConfetti} className="px-10 py-5 bg-surface-bright/10 backdrop-blur-md border border-white/5 text-on-surface font-label font-bold text-lg rounded-full hover:bg-surface-bright/20 transition-all">
+          Celebrate Again
         </button>
       </div>
     </div>
@@ -297,10 +297,16 @@ const TimelineScreen: React.FC<{ answers: string[] }> = ({ answers }) => (
             </div>
           </div>
           <div className="md:w-1/2">
-            <div className={`glass-card p-8 rounded-lg border-l-4 ${idx % 3 === 0 ? 'border-primary' : idx % 3 === 1 ? 'border-secondary' : 'border-tertiary'} group-hover:translate-x-2 transition-all duration-500`}>
+            <div className={`glass-card p-8 rounded-lg border-l-4 ${idx % 3 === 0 ? 'border-primary' : idx % 3 === 1 ? 'border-secondary' : 'border-tertiary'} group-hover:translate-x-2 transition-all duration-500 shadow-xl`}>
               <h3 className={`font-headline text-lg mb-2 ${idx % 3 === 0 ? 'text-primary' : idx % 3 === 1 ? 'text-secondary' : 'text-tertiary'}`}>Year {q.year}</h3>
-              <p className="font-body text-on-surface italic mb-4">"{answers[idx] || "A memory waiting to be written..."}"</p>
-              <div className="flex items-center gap-2 text-on-surface-variant text-xs font-label uppercase tracking-widest">
+              <div className="relative">
+                <span className="absolute -left-4 top-0 text-4xl opacity-10 font-serif">"</span>
+                <p className={`font-body text-on-surface italic mb-4 relative z-10 ${answers[idx] ? 'text-lg font-medium' : 'opacity-40'}`}>
+                  {answers[idx] || "A memory waiting to be written..."}
+                </p>
+                <span className="absolute -right-2 bottom-2 text-4xl opacity-10 font-serif">"</span>
+              </div>
+              <div className="flex items-center gap-2 text-on-surface-variant text-xs font-label uppercase tracking-widest border-t border-outline-variant/10 pt-4">
                 <span className="material-symbols-outlined text-sm">{q.icon}</span>
                 <span>{q.date}</span>
               </div>
@@ -317,6 +323,16 @@ export default function App() {
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>(new Array(20).fill(''));
   const [currentInput, setCurrentInput] = useState('');
+  
+  // Sync currentInput to answers array for real-time timeline updates
+  useEffect(() => {
+    if (screen === 'journey') {
+      const newAnswers = [...answers];
+      newAnswers[currentYearIndex] = currentInput;
+      setAnswers(newAnswers);
+    }
+  }, [currentInput, currentYearIndex, screen]);
+
   const [displayAge, setDisplayAge] = useState(17);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
@@ -350,7 +366,10 @@ export default function App() {
       await playBirthdayConfetti();
       showPreparingMessage();
       setTimeout(() => {
-        redirectToCelebration();
+        setIsPreparing(false);
+        setScreen('celebration');
+        triggerConfetti();
+        animateAge();
       }, 1500);
     }
   };
@@ -435,10 +454,6 @@ export default function App() {
     setIsPreparing(true);
   };
 
-  const redirectToCelebration = () => {
-    window.location.href = 'celebration.html';
-  };
-
   const saveAnswer = (answer: string) => {
     const newAnswers = [...answers];
     newAnswers[currentYearIndex] = answer;
@@ -497,7 +512,7 @@ export default function App() {
             isCapturing={isCapturing}
           />
         )}
-        {screen === 'celebration' && <CelebrationScreen key="celebration" setScreen={setScreen} />}
+        {screen === 'celebration' && <CelebrationScreen key="celebration" setScreen={setScreen} triggerConfetti={triggerConfetti} />}
         {screen === 'timeline' && <TimelineScreen key="timeline" answers={answers} />}
       </AnimatePresence>
 
